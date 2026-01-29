@@ -21,3 +21,5 @@ This repository reproduces the HEX pipeline for predicting protein expression fr
 6. **`hex/vc_render.py`**
    * Renders the Virtual CODEX maps into visual outputs
    * Generates per-channel grayscale images, pseudo-colored images, and composite visualizations
+7. **`hex/csv_to_codex_h5.py`**
+8. **`mica/codex_h5_png2fea.py`**
