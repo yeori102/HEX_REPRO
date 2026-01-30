@@ -145,40 +145,38 @@ def extract_coords_from_wsi(
 # -----------------------------
 # CLI
 # -----------------------------
-def parse_args():
-    p = argparse.ArgumentParser(
-        description="Extract all tissue (non-background) patch coordinates from WSI (.svs)."
-    )
-    p.add_argument("--wsi_dir", type=str, required=True, help="Directory containing .svs files")
-    p.add_argument("--out_csv_dir", type=str, required=True, help="Output directory for CSV files")
-
-    p.add_argument("--patch_size", type=int, default=224, help="Patch size at level 0")
-    p.add_argument("--step_size", type=int, default=224, help="Stride at level 0")
-    p.add_argument("--mask_level", type=int, default=None, help="Level for tissue mask (default: last)")
-    p.add_argument("--min_tissue_frac", type=float, default=0.3, help="Minimum tissue fraction")
-
-    return p.parse_args()
-
-
 def main():
-    args = parse_args()
-    os.makedirs(args.out_csv_dir, exist_ok=True)
+    # =============================
+    # CONFIG (여기서 직접 설정)
+    # =============================
+    wsi_dir = "/data-hdd/home/shared/TCGA/WSI/939eae7b-afc7-437a-81e3-1e9615897027"
+    out_csv_dir = "/data-hdd/home/shared/TCGA/WSI/939eae7b-afc7-437a-81e3-1e9615897027"
 
-    wsi_files = sorted([f for f in os.listdir(args.wsi_dir) if f.lower().endswith(".svs")])
+    patch_size = 224
+    step_size = 224
+    mask_level = None          # None이면 자동으로 마지막 레벨
+    min_tissue_frac = 0.3
+    # =============================
+
+    os.makedirs(out_csv_dir, exist_ok=True)
+
+    wsi_files = sorted(
+        [f for f in os.listdir(wsi_dir) if f.lower().endswith(".svs")]
+    )
 
     for f in tqdm(wsi_files, desc="WSI"):
-        wsi_path = os.path.join(args.wsi_dir, f)
+        wsi_path = os.path.join(wsi_dir, f)
         slide_id = os.path.splitext(f)[0]
-        out_csv_path = os.path.join(args.out_csv_dir, f"{slide_id}.csv")
+        out_csv_path = os.path.join(out_csv_dir, f"{slide_id}.csv")
 
         try:
             extract_coords_from_wsi(
                 wsi_path=wsi_path,
                 out_csv_path=out_csv_path,
-                patch_size=args.patch_size,
-                step_size=args.step_size,
-                mask_level=args.mask_level,
-                min_tissue_frac=args.min_tissue_frac
+                patch_size=patch_size,
+                step_size=step_size,
+                mask_level=mask_level,
+                min_tissue_frac=min_tissue_frac
             )
         except Exception as e:
             print(f"[ERROR] {slide_id}: {e}")
@@ -191,14 +189,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-"""
-Command-line
-
-python (execution_file_name) \
-  --wsi_dir (wsi_file_directory_name) \
-  --out_csv_dir . \
-  --patch_size 224 \
-  --step_size 224 \
-  --min_tissue_frac 0.3
-"""
